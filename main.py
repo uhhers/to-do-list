@@ -13,6 +13,9 @@ ttkWidget.add(viewElements, text="View Elements")
 ttkWidget.add(editElements, text="Edit Elements")
 ttkWidget.pack()
 
+addElementInput = Text(viewElements, height=1, width=15)
+addElementInput.pack()
+
 listbox = Listbox(viewElements)
 listbox.pack()
 
