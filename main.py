@@ -56,7 +56,7 @@ def updateList():
     editListbox.delete(0, END)
     index = 1
     for i in stringlist:
-        if i == "0":
+        if i == "0" or i == "1":
             continue
         editListbox.insert(index, i)
         index += 1
@@ -71,9 +71,29 @@ def getElementInfo():
     if selectedElement:
         selectedElementIndex = selectedElement[0]
         selectedElementTxt = editListbox.get(selectedElementIndex)
-        elementNum = stringlist[stringlist.index(selectedElementTxt) + 1] == 1
+        elementNum = stringlist[stringlist.index(selectedElementTxt) + 1]
 
-        messagebox.showinfo("Element Info", f"{selectedElementTxt} [ {"Done" if elementNum else "Undone"} ]")
+        messagebox.showinfo("Element Info", f"{selectedElementTxt} [ {"Done" if elementNum == "1" else "Undone"} ]")
+
+def toggleElement():
+    with open(save_path, "r") as file:
+        stringinput = file.read()
+    stringlist = stringinput.split("/")
+    stringlist.pop()
+
+    selectedElement = editListbox.curselection()
+
+    if selectedElement:
+        selectedElementIndex = selectedElement[0]
+        selectedElementTxt = editListbox.get(selectedElementIndex)
+        stringlist[stringlist.index(selectedElementTxt) + 1] = "1" if stringlist[stringlist.index(selectedElementTxt) + 1] == "0" or stringlist[stringlist.index(selectedElementTxt) + 1] == 0 else "0"
+
+    with open(save_path, "w") as file:
+        for text in stringlist:
+            file.write(text + "/")
+        file.close()
+
+
 
 ttkWidget = ttk.Notebook(mainWindow)
 ttkWidget.pack()
@@ -100,7 +120,7 @@ addElementButton = Button(view2Elements, command = makeActivity, text = "Add Ele
 editListbox = Listbox(edit1Elements, height = 20)
 updateEditButton = Button(edit2Elements, command = updateList, text="Update List", relief=GROOVE, borderwidth = 5 )
 infoEditButton = Button(edit2Elements, command = getElementInfo, text = "Element Info", relief = GROOVE, borderwidth = 5 )
-toggleEditButton = Button(edit2Elements, text = "Toggle Element", relief = GROOVE, borderwidth = 5)   
+toggleEditButton = Button(edit2Elements, command = toggleElement, text = "Toggle Element", relief = GROOVE, borderwidth = 5)   
 
 addElementViewerListbox.pack()
 addElementButton.pack(fill = X)
@@ -108,6 +128,7 @@ addElementInput.pack(fill = X)
 editListbox.pack()
 updateEditButton.pack(fill = X)
 infoEditButton.pack(fill = X)
+toggleEditButton.pack(fill = X)
 
 
 
