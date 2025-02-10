@@ -17,7 +17,8 @@ else:
     pass
 
 mainWindow = Tk()
-mainWindow.geometry("450x450+10+10")
+mainWindow.geometry("295x360+10+10")
+mainWindow.resizable(FALSE, FALSE)
 
 def makeActivity():
     with open(save_path, "r") as file:
@@ -71,9 +72,12 @@ def getElementInfo():
     if selectedElement:
         selectedElementIndex = selectedElement[0]
         selectedElementTxt = editListbox.get(selectedElementIndex)
-        elementNum = stringlist[stringlist.index(selectedElementTxt) + 1]
+        if selectedElementTxt in stringlist:
+            elementNum = stringlist[stringlist.index(selectedElementTxt) + 1]
 
-        messagebox.showinfo("Element Info", f"{selectedElementTxt} [ {"Done" if elementNum == "1" else "Undone"} ]")
+            messagebox.showinfo("Element Info", f"{selectedElementTxt} [ {"Done" if elementNum == "1" else "Undone"} ]")
+        else:
+            messagebox.showerror("Element Info", selectedElementTxt + " doesn't exist.")
 
 def toggleElement():
     with open(save_path, "r") as file:
@@ -86,14 +90,37 @@ def toggleElement():
     if selectedElement:
         selectedElementIndex = selectedElement[0]
         selectedElementTxt = editListbox.get(selectedElementIndex)
-        stringlist[stringlist.index(selectedElementTxt) + 1] = "1" if stringlist[stringlist.index(selectedElementTxt) + 1] == "0" or stringlist[stringlist.index(selectedElementTxt) + 1] == 0 else "0"
-
+        if selectedElementTxt in stringlist:
+            stringlist[stringlist.index(selectedElementTxt) + 1] = "1" if stringlist[stringlist.index(selectedElementTxt) + 1] == "0" or stringlist[stringlist.index(selectedElementTxt) + 1] == 0 else "0"
+        else:
+            messagebox.showerror("Toggling Info", selectedElementTxt + " doesn't exist")
     with open(save_path, "w") as file:
         for text in stringlist:
             file.write(text + "/")
         file.close()
 
+def deleteElement():
+    with open(save_path, "r") as file:
+        stringinput = file.read()
+    stringlist = stringinput.split("/")
+    stringlist.pop()
 
+    selectedElement = editListbox.curselection()
+
+    if selectedElement:
+        selectedElementIndex = selectedElement[0]
+        selectedElementTxt = editListbox.get(selectedElementIndex)
+        if selectedElementTxt in stringlist:
+            stringlist.pop(stringlist.index(selectedElementTxt) + 1)
+            stringlist.pop(stringlist.index(selectedElementTxt))
+            messagebox.showinfo("Deletion info", selectedElementTxt + " was deleted.")
+        else:
+            messagebox.showerror("Deletion info", selectedElementTxt + " doesn't exist.")
+
+    with open(save_path, "w") as file:
+        for text in stringlist:
+            file.write(text + "/")
+        file.close()
 
 ttkWidget = ttk.Notebook(mainWindow)
 ttkWidget.pack()
@@ -114,13 +141,14 @@ ttkWidget.add(mainViewElements, text="View Elements")
 ttkWidget.add(mainEditElements, text="Edit Elements")
 ttkWidget.pack()
 
-addElementViewerListbox = Listbox(view1Elements, height = 20)
+addElementViewerListbox = Listbox(view1Elements, height = 20, borderwidth = 5, relief = RIDGE)
 addElementInput = Text(view2Elements, height = 1, width = 20)
-addElementButton = Button(view2Elements, command = makeActivity, text = "Add Element", relief=GROOVE, borderwidth = 5 )
-editListbox = Listbox(edit1Elements, height = 20)
-updateEditButton = Button(edit2Elements, command = updateList, text="Update List", relief=GROOVE, borderwidth = 5 )
-infoEditButton = Button(edit2Elements, command = getElementInfo, text = "Element Info", relief = GROOVE, borderwidth = 5 )
-toggleEditButton = Button(edit2Elements, command = toggleElement, text = "Toggle Element", relief = GROOVE, borderwidth = 5)   
+addElementButton = Button(view2Elements, command = makeActivity, text = "Add Element", relief = RAISED, borderwidth = 5 )
+editListbox = Listbox(edit1Elements, height = 20, borderwidth = 5, relief = RIDGE)
+updateEditButton = Button(edit2Elements, command = updateList, text="Update List", relief = RAISED, borderwidth = 5 )
+infoEditButton = Button(edit2Elements, command = getElementInfo, text = "Element Info", relief = RAISED, borderwidth = 5 )
+toggleEditButton = Button(edit2Elements, command = toggleElement, text = "Toggle Element", relief = RAISED, borderwidth = 5)   
+deleteEditButton = Button(edit2Elements, command = deleteElement, text = "Delete Element", relief = RAISED, borderwidth = 5)
 
 addElementViewerListbox.pack()
 addElementButton.pack(fill = X)
@@ -129,7 +157,6 @@ editListbox.pack()
 updateEditButton.pack(fill = X)
 infoEditButton.pack(fill = X)
 toggleEditButton.pack(fill = X)
-
-
+deleteEditButton.pack(fill = X)
 
 mainWindow.mainloop()
